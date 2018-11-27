@@ -1,0 +1,12 @@
+$ npm install express-generator@4 -g
+
+$ express node-postgres-promises
+$ cd node-postgres-promises
+$ npm install
+
+$ npm start
+#port 3000
+
+
+$ npm install pg-promise@5 --save
+$ npm install bluebird@3 --save
