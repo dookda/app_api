@@ -10,3 +10,4 @@ $ npm start
 
 $ npm install pg-promise@5 --save
 $ npm install bluebird@3 --save
+$ npm install cors --save

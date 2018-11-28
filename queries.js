@@ -125,13 +125,64 @@ getPopTH = (req, res, next) => {
         })
 }
 
+// var pgp = require('pg-promise')(options);
+var connectHinfo = 'postgres://postgres:1234@localhost:5432/hinfo';
+var hinfo = pgp(connectHinfo);
+
+hinfoSelect = (req, res, next) => {
+    const sql = "select * from mobile_report order by pdate desc";
+    hinfo.any(sql)
+        .then((data) => {
+            res.status(200).json({
+                status: 'success',
+                data: data,
+                message: 'retrived survey data'
+            })
+        }).catch((error) => {
+            return next(error)
+        })
+}
+
+hinfoInsert = (req, res, next) => {
+    const sql = "INSERT INTO mobile_report (lat, lon, pname, pdesc, photo, pdate, ptype, geom)VALUES(${lat}, ${lon}, ${pname}, ${pdesc}, ${photo}, ${pdate}, ${ptype}, ST_SetSRID(ST_MakePoint(${lon},${lat}),4326))";
+    hinfo.any(sql, req.body)
+        .then((data) => {
+            res.status(200).json({
+                status: 'success',
+                data: data,
+                message: 'retrived list'
+            });
+        })
+        .catch((error) => {
+            return next(error);
+        })
+}
+
+createData = (req, res, next) => {
+    hinfo.none("INSERT INTO user_profile(uemail,upass)VALUES(${email},${pass})", req.body)
+        .then((data) => {
+            res.status(200).json({
+                status: "success",
+                data: data,
+                message: "Add success"
+            })
+        })
+        .catch((err) => {
+            return next(err);
+        })
+};
 
 module.exports = {
+    // pop
     getPopTam: getPopTam,
     getPopAmp: getPopAmp,
     getPopPro: getPopPro,
     getPopTH: getPopTH,
     getProv: getProv,
     getAmp: getAmp,
-    getTam: getTam
+    getTam: getTam,
+    // hinfo
+    hinfoSelect: hinfoSelect,
+    hinfoInsert: hinfoInsert,
+    createData: createData
 }
