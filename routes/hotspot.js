@@ -23,6 +23,7 @@ var poly_pl = turf.polygon(json.pl.features[0].geometry.coordinates[0]);
 var poly_pr = turf.polygon(json.pr.features[0].geometry.coordinates[0]);
 var poly_ud = turf.polygon(json.ud.features[0].geometry.coordinates[0]);
 var poly_st = turf.polygon(json.st.features[0].geometry.coordinates[0]);
+var poly_th = turf.polygon(json.th.features[0].geometry.coordinates[0]);
 
 var poly = turf.polygon([
     [
@@ -75,7 +76,6 @@ router.get("/hp_modis", async function (req, res, next) {
             let pr = 0;
             let ud = 0;
             let st = 0;
-
             data.forEach(function (point) {
                 let lat = Number(point.latitude);
                 let lon = Number(point.longitude);
@@ -162,82 +162,77 @@ router.get("/hp_viirs", async function (req, res, next) {
         })
 });
 
-router.get("/hp_viirs_th", async function (req, res, next) {
-    csv().fromStream(request.get('https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs/csv/VNP14IMGTDL_NRT_SouthEast_Asia_24h.csv'))
+router.get("/hp_modis_th", async function (req, res, next) {
+    csv().fromStream(request.get('https://firms.modaps.eosdis.nasa.gov/data/active_fire/c6/csv/MODIS_C6_SouthEast_Asia_24h.csv'))
         .then(async (data) => {
-            // let jsonFeatures = [];
-            // let pl = 0;
-            // let pr = 0;
-            // let ud = 0;
-            // let st = 0;
+            let jsonFeatures = [];
+            let th = 0;
 
-            // data.forEach(function (point) {
-            //     let lat = Number(point.latitude);
-            //     let lon = Number(point.longitude);
-            //     let pt = turf.point([lon, lat]);
-            //     if (turf.booleanPointInPolygon(pt, poly_pl) == true) pl += 1;
-            //     if (turf.booleanPointInPolygon(pt, poly_pr) == true) pr += 1;
-            //     if (turf.booleanPointInPolygon(pt, poly_ud) == true) ud += 1;
-            //     if (turf.booleanPointInPolygon(pt, poly_st) == true) st += 1;
-            //     if (turf.booleanPointInPolygon(pt, poly) == true) {
-            //         let feature = {
-            //             type: 'Feature',
-            //             properties: point,
-            //             geometry: {
-            //                 type: 'Point',
-            //                 coordinates: [lon, lat]
-            //             }
-            //         };
-            //         jsonFeatures.push(feature);
-            //     }
-            // });
-            // let geoJson = {
-            //     type: 'FeatureCollection',
-            //     features: jsonFeatures
-            // };
-            // await res.status(200).json({
-            //     status: 'success',
-            //     pl: pl,
-            //     pr: pr,
-            //     st: st,
-            //     ud: ud,
-            //     data: geoJson,
-            //     message: 'retrived survey data'
-            // });
-
-            var points = turf.points([
-                [-46.6318, -23.5523],
-                [-46.6246, -23.5325],
-                [-46.6062, -23.5513],
-                [-46.663, -23.554],
-                [-46.643, -23.557]
-            ]);
-
-            var searchWithin = turf.polygon([
-                [
-                    [-46.653, -23.543],
-                    [-46.634, -23.5346],
-                    [-46.613, -23.543],
-                    [-46.614, -23.559],
-                    [-46.631, -23.567],
-                    [-46.653, -23.560],
-                    [-46.653, -23.543]
-                ]
-            ]);
-
+            data.forEach(function (point) {
+                let lat = Number(point.latitude);
+                let lon = Number(point.longitude);
+                let pt = turf.point([lon, lat]);
+                if (turf.booleanPointInPolygon(pt, poly_th) == true) th += 1;
+                if (turf.booleanPointInPolygon(pt, poly_th) == true) {
+                    let feature = {
+                        type: 'Feature',
+                        properties: point,
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [lon, lat]
+                        }
+                    };
+                    jsonFeatures.push(feature);
+                }
+            });
+            let geoJson = {
+                type: 'FeatureCollection',
+                features: jsonFeatures
+            };
             await res.status(200).json({
                 status: 'success',
-                pl: pl,
-                pr: pr,
-                st: st,
-                ud: ud,
+                th: th,
                 data: geoJson,
                 message: 'retrived survey data'
             });
+        }).catch((error) => {
+            return next(error)
+        })
+});
 
-            var ptsWithin = turf.pointsWithinPolygon(points, searchWithin);
-            console.log(ptsWithin);
+router.get("/hp_viirs_th", async function (req, res, next) {
+    csv().fromStream(request.get('https://firms.modaps.eosdis.nasa.gov/data/active_fire/viirs/csv/VNP14IMGTDL_NRT_SouthEast_Asia_24h.csv'))
+        .then(async (data) => {
+            let jsonFeatures = [];
+            let th = 0;
 
+            data.forEach(function (point) {
+                let lat = Number(point.latitude);
+                let lon = Number(point.longitude);
+                let pt = turf.point([lon, lat]);
+                if (turf.booleanPointInPolygon(pt, poly_th) == true) th += 1;
+                if (turf.booleanPointInPolygon(pt, poly_th) == true) {
+                    let feature = {
+                        type: 'Feature',
+                        properties: point,
+                        geometry: {
+                            type: 'Point',
+                            coordinates: [lon, lat]
+                        }
+                    };
+                    jsonFeatures.push(feature);
+                }
+            });
+            let geoJson = {
+                type: 'FeatureCollection',
+                features: jsonFeatures
+            };
+            await res.status(200).json({
+                status: 'success',
+                th: th,
+                data: geoJson,
+                message: 'retrived survey data'
+            });
         }).catch((error) => {
             return next(error)
         })

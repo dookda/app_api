@@ -6,7 +6,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-// var indexRouter = require('./routes/index');
+var indexRouter = require('./routes/index');
 var pro40Router = require('./routes/pro40');
 var usersRouter = require('./routes/urban');
 var rainRouter = require('./routes/rain');
@@ -40,7 +40,7 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.use('/', indexRouter);
+app.use('/', indexRouter);
 app.use('/pro40', pro40Router);
 app.use('/urban', usersRouter);
 app.use('/rain', rainRouter);
